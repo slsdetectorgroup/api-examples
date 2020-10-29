@@ -15,6 +15,9 @@ target_link_libraries(e3-time slsDetectorShared)
 add_executable(e4-rxr e4-receiver_callbacks.cpp)
 target_link_libraries(e4-rxr slsReceiverShared slsSupportStatic pthread)
 
+add_executable(e5-acquire e5-acquire.cpp)
+target_link_libraries(e5-acquire slsDetectorShared)
+
 
 # Copy config files to bin dir. 
 set( CONFIG_FILES
