@@ -12,11 +12,14 @@ target_link_libraries(e2-result slsDetectorShared)
 add_executable(e3-time e3-time.cpp)
 target_link_libraries(e3-time slsDetectorShared)
 
+add_executable(e4-rxr e4-receiver_callbacks.cpp)
+target_link_libraries(e4-rxr slsReceiverShared slsSupportStatic pthread)
+
+
 # Copy config files to bin dir. 
 set( CONFIG_FILES
     one_det_no_receiver.config  
     one_det_minimal.config 
-
 )
 
 foreach(FILE ${CONFIG_FILES})
