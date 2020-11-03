@@ -1,11 +1,11 @@
 
-#include "Receiver.h"
-#include "logger.h"
+#include <sls/Receiver.h>
 
 #include <csignal> //SIGINT
 #include <semaphore.h>
 #include <sys/syscall.h>
 #include <unistd.h>
+#include <iostream>
 
 sem_t semaphore;
 
@@ -24,10 +24,11 @@ void sigInterruptHandler(int p) { sem_post(&semaphore); }
  * \returns ignored
  */
 int StartAcq(std::string filepath, std::string filename, uint64_t fileindex,
-             uint32_t datasize, void *p) {
-  LOG(logINFOBLUE) << "#### StartAcq:  filepath:" << filepath
-                   << "  filename:" << filename << " fileindex:" << fileindex
-                   << "  datasize:" << datasize << " ####";
+             uint32_t datasize, void *p)
+{
+  std::cout << "#### StartAcq:  filepath:" << filepath
+            << "  filename:" << filename << " fileindex:" << fileindex
+            << "  datasize:" << datasize << " ####";
   return 0;
 }
 
@@ -36,8 +37,9 @@ int StartAcq(std::string filepath, std::string filename, uint64_t fileindex,
  * @param frames Number of frames caught
  * @param p pointer to object
  */
-void AcquisitionFinished(uint64_t frames, void *p) {
-  LOG(logINFOBLUE) << "#### AcquisitionFinished: frames:" << frames << " ####";
+void AcquisitionFinished(uint64_t frames, void *p)
+{
+  std::cout << "#### AcquisitionFinished: frames:" << frames << " ####";
 }
 
 /**
@@ -47,30 +49,31 @@ void AcquisitionFinished(uint64_t frames, void *p) {
  * @param datasize data size in bytes.
  * @param p pointer to object
  */
-void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p) {
+void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p)
+{
   slsDetectorDefs::sls_receiver_header *header =
       (slsDetectorDefs::sls_receiver_header *)metadata;
   slsDetectorDefs::sls_detector_header detectorHeader = header->detHeader;
 
-  LOG(logINFOBLUE) << "#### " << detectorHeader.row << " GetData: ####\n"
-                   << "frameNumber: " << detectorHeader.frameNumber
-                   << "\t\texpLength: " << detectorHeader.expLength
-                   << "\t\tpacketNumber: " << detectorHeader.packetNumber
-                   << "\t\tbunchId: " << detectorHeader.bunchId
-                   << "\t\ttimestamp: " << detectorHeader.timestamp
-                   << "\t\tmodId: " << detectorHeader.modId
-                   << "\t\trow: " << detectorHeader.row
-                   << "\t\tcolumn: " << detectorHeader.column
-                   << "\t\treserved: " << detectorHeader.reserved
-                   << "\t\tdebug: " << detectorHeader.debug
-                   << "\t\troundRNumber: " << detectorHeader.roundRNumber
-                   << "\t\tdetType: " << detectorHeader.detType
-                   << "\t\tversion: "
-                   << detectorHeader.version
-                   //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
-                   << "\t\tfirstbytedata: " << std::hex << "0x"
-                   << ((uint8_t)(*((uint8_t *)(datapointer))))
-                   << "\t\tdatsize: " << datasize << "\n\n";
+  std::cout << "#### " << detectorHeader.row << " GetData: ####\n"
+            << "frameNumber: " << detectorHeader.frameNumber
+            << "\t\texpLength: " << detectorHeader.expLength
+            << "\t\tpacketNumber: " << detectorHeader.packetNumber
+            << "\t\tbunchId: " << detectorHeader.bunchId
+            << "\t\ttimestamp: " << detectorHeader.timestamp
+            << "\t\tmodId: " << detectorHeader.modId
+            << "\t\trow: " << detectorHeader.row
+            << "\t\tcolumn: " << detectorHeader.column
+            << "\t\treserved: " << detectorHeader.reserved
+            << "\t\tdebug: " << detectorHeader.debug
+            << "\t\troundRNumber: " << detectorHeader.roundRNumber
+            << "\t\tdetType: " << detectorHeader.detType
+            << "\t\tversion: "
+            << detectorHeader.version
+            //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
+            << "\t\tfirstbytedata: " << std::hex << "0x"
+            << ((uint8_t)(*((uint8_t *)(datapointer))))
+            << "\t\tdatsize: " << datasize << "\n\n";
 }
 
 /**
@@ -83,49 +86,52 @@ void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p) {
  * @param p pointer to object
  */
 void GetData(char *metadata, char *datapointer, uint32_t &revDatasize,
-             void *p) {
+             void *p)
+{
   slsDetectorDefs::sls_receiver_header *header =
       (slsDetectorDefs::sls_receiver_header *)metadata;
   slsDetectorDefs::sls_detector_header detectorHeader = header->detHeader;
 
-  LOG(logINFOBLUE) << "#### " << detectorHeader.row << " GetData: ####\n"
-                   << "frameNumber: " << detectorHeader.frameNumber
-                   << "\t\texpLength: " << detectorHeader.expLength
-                   << "\t\tpacketNumber: " << detectorHeader.packetNumber
-                   << "\t\tbunchId: " << detectorHeader.bunchId
-                   << "\t\ttimestamp: " << detectorHeader.timestamp
-                   << "\t\tmodId: " << detectorHeader.modId
-                   << "\t\trow: " << detectorHeader.row
-                   << "\t\tcolumn: " << detectorHeader.column
-                   << "\t\treserved: " << detectorHeader.reserved
-                   << "\t\tdebug: " << detectorHeader.debug
-                   << "\t\troundRNumber: " << detectorHeader.roundRNumber
-                   << "\t\tdetType: " << detectorHeader.detType
-                   << "\t\tversion: "
-                   << detectorHeader.version
-                   //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
-                   << "\t\tfirstbytedata: " << std::hex << "0x"
-                   << ((uint8_t)(*((uint8_t *)(datapointer))))
-                   << "\t\tdatsize: " << revDatasize << "\n\n";
+  std::cout << "#### " << detectorHeader.row << " GetData: ####\n"
+            << "frameNumber: " << detectorHeader.frameNumber
+            << "\t\texpLength: " << detectorHeader.expLength
+            << "\t\tpacketNumber: " << detectorHeader.packetNumber
+            << "\t\tbunchId: " << detectorHeader.bunchId
+            << "\t\ttimestamp: " << detectorHeader.timestamp
+            << "\t\tmodId: " << detectorHeader.modId
+            << "\t\trow: " << detectorHeader.row
+            << "\t\tcolumn: " << detectorHeader.column
+            << "\t\treserved: " << detectorHeader.reserved
+            << "\t\tdebug: " << detectorHeader.debug
+            << "\t\troundRNumber: " << detectorHeader.roundRNumber
+            << "\t\tdetType: " << detectorHeader.detType
+            << "\t\tversion: "
+            << detectorHeader.version
+            //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
+            << "\t\tfirstbytedata: " << std::hex << "0x"
+            << ((uint8_t)(*((uint8_t *)(datapointer))))
+            << "\t\tdatsize: " << revDatasize << "\n\n";
 
   // if data is modified, eg ROI and size is reduced
   revDatasize = 26000;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
   sem_init(&semaphore, 1, 0);
 
-  LOG(logINFOBLUE) << "Created [ Tid: " << syscall(SYS_gettid) << " ]";
+  std::cout << "Created [ Tid: " << syscall(SYS_gettid) << " ]";
 
   // Catch signal SIGINT to close files and call destructors properly
   struct sigaction sa;
   sa.sa_flags = 0;                     // no flags
   sa.sa_handler = sigInterruptHandler; // handler function
-  sigemptyset(&sa.sa_mask); // dont block additional signals during invocation
-                            // of handler
-  if (sigaction(SIGINT, &sa, nullptr) == -1) {
-    LOG(logERROR) << "Could not set handler function for SIGINT";
+  sigemptyset(&sa.sa_mask);            // dont block additional signals during invocation
+                                       // of handler
+  if (sigaction(SIGINT, &sa, nullptr) == -1)
+  {
+    std::cout << "Could not set handler function for SIGINT";
   }
 
   // if socket crash, ignores SISPIPE, prevents global signal handler
@@ -135,33 +141,37 @@ int main(int argc, char *argv[]) {
   asa.sa_handler = SIG_IGN;  // handler function
   sigemptyset(&asa.sa_mask); // dont block additional signals during
                              // invocation of handler
-  if (sigaction(SIGPIPE, &asa, nullptr) == -1) {
-    LOG(logERROR) << "Could not set handler function for SIGPIPE";
+  if (sigaction(SIGPIPE, &asa, nullptr) == -1)
+  {
+    std::cout << "Could not set handler function for SIGPIPE";
   }
 
-  try {
+  try
+  {
     Receiver r(argc, argv);
 
     // register call backs
     /** - Call back for start acquisition */
-    LOG(logINFOBLUE) << "Registering 	StartAcq()";
+    std::cout << "Registering 	StartAcq()";
     r.registerCallBackStartAcquisition(StartAcq, nullptr);
 
     /** - Call back for acquisition finished */
-    LOG(logINFOBLUE) << "Registering 	AcquisitionFinished()";
+    std::cout << "Registering 	AcquisitionFinished()";
     r.registerCallBackAcquisitionFinished(AcquisitionFinished, nullptr);
 
     /* 	- Call back for raw data */
-    LOG(logINFOBLUE) << "Registering GetData()";
+    std::cout << "Registering GetData()";
     r.registerCallBackRawDataReady(GetData, nullptr);
 
-    LOG(logINFO) << "[ Press \'Ctrl+c\' to exit ]";
+    std::cout << "[ Press \'Ctrl+c\' to exit ]";
     sem_wait(&semaphore);
     sem_destroy(&semaphore);
-  } catch (...) {
+  }
+  catch (...)
+  {
     // pass
   }
-  LOG(logINFOBLUE) << "Exiting [ Tid: " << syscall(SYS_gettid) << " ]";
-  LOG(logINFO) << "Exiting Receiver";
+  std::cout << "Exiting [ Tid: " << syscall(SYS_gettid) << " ]";
+  std::cout << "Exiting Receiver";
   return 0;
 }
