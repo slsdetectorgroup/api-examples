@@ -2,10 +2,10 @@
 #include <sls/Receiver.h>
 
 #include <csignal> //SIGINT
+#include <iostream>
 #include <semaphore.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-#include <iostream>
 
 sem_t semaphore;
 
@@ -24,8 +24,7 @@ void sigInterruptHandler(int p) { sem_post(&semaphore); }
  * \returns ignored
  */
 int StartAcq(std::string filepath, std::string filename, uint64_t fileindex,
-             uint32_t datasize, void *p)
-{
+             uint32_t datasize, void *p) {
   std::cout << "#### StartAcq:  filepath:" << filepath
             << "  filename:" << filename << " fileindex:" << fileindex
             << "  datasize:" << datasize << " ####";
@@ -37,8 +36,7 @@ int StartAcq(std::string filepath, std::string filename, uint64_t fileindex,
  * @param frames Number of frames caught
  * @param p pointer to object
  */
-void AcquisitionFinished(uint64_t frames, void *p)
-{
+void AcquisitionFinished(uint64_t frames, void *p) {
   std::cout << "#### AcquisitionFinished: frames:" << frames << " ####";
 }
 
@@ -49,8 +47,7 @@ void AcquisitionFinished(uint64_t frames, void *p)
  * @param datasize data size in bytes.
  * @param p pointer to object
  */
-void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p)
-{
+void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p) {
   slsDetectorDefs::sls_receiver_header *header =
       (slsDetectorDefs::sls_receiver_header *)metadata;
   slsDetectorDefs::sls_detector_header detectorHeader = header->detHeader;
@@ -67,8 +64,7 @@ void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p)
             << "\t\treserved: " << detectorHeader.reserved
             << "\t\tdebug: " << detectorHeader.debug
             << "\t\troundRNumber: " << detectorHeader.roundRNumber
-            << "\t\tdetType: " << detectorHeader.detType
-            << "\t\tversion: "
+            << "\t\tdetType: " << detectorHeader.detType << "\t\tversion: "
             << detectorHeader.version
             //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
             << "\t\tfirstbytedata: " << std::hex << "0x"
@@ -86,8 +82,7 @@ void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p)
  * @param p pointer to object
  */
 void GetData(char *metadata, char *datapointer, uint32_t &revDatasize,
-             void *p)
-{
+             void *p) {
   slsDetectorDefs::sls_receiver_header *header =
       (slsDetectorDefs::sls_receiver_header *)metadata;
   slsDetectorDefs::sls_detector_header detectorHeader = header->detHeader;
@@ -104,8 +99,7 @@ void GetData(char *metadata, char *datapointer, uint32_t &revDatasize,
             << "\t\treserved: " << detectorHeader.reserved
             << "\t\tdebug: " << detectorHeader.debug
             << "\t\troundRNumber: " << detectorHeader.roundRNumber
-            << "\t\tdetType: " << detectorHeader.detType
-            << "\t\tversion: "
+            << "\t\tdetType: " << detectorHeader.detType << "\t\tversion: "
             << detectorHeader.version
             //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
             << "\t\tfirstbytedata: " << std::hex << "0x"
@@ -116,8 +110,7 @@ void GetData(char *metadata, char *datapointer, uint32_t &revDatasize,
   revDatasize = 26000;
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
   sem_init(&semaphore, 1, 0);
 
@@ -127,10 +120,9 @@ int main(int argc, char *argv[])
   struct sigaction sa;
   sa.sa_flags = 0;                     // no flags
   sa.sa_handler = sigInterruptHandler; // handler function
-  sigemptyset(&sa.sa_mask);            // dont block additional signals during invocation
-                                       // of handler
-  if (sigaction(SIGINT, &sa, nullptr) == -1)
-  {
+  sigemptyset(&sa.sa_mask); // dont block additional signals during invocation
+                            // of handler
+  if (sigaction(SIGINT, &sa, nullptr) == -1) {
     std::cout << "Could not set handler function for SIGINT";
   }
 
@@ -141,14 +133,12 @@ int main(int argc, char *argv[])
   asa.sa_handler = SIG_IGN;  // handler function
   sigemptyset(&asa.sa_mask); // dont block additional signals during
                              // invocation of handler
-  if (sigaction(SIGPIPE, &asa, nullptr) == -1)
-  {
+  if (sigaction(SIGPIPE, &asa, nullptr) == -1) {
     std::cout << "Could not set handler function for SIGPIPE";
   }
 
-  try
-  {
-    Receiver r(argc, argv);
+  try {
+    sls::Receiver r(argc, argv);
 
     // register call backs
     /** - Call back for start acquisition */
@@ -166,9 +156,7 @@ int main(int argc, char *argv[])
     std::cout << "[ Press \'Ctrl+c\' to exit ]";
     sem_wait(&semaphore);
     sem_destroy(&semaphore);
-  }
-  catch (...)
-  {
+  } catch (...) {
     // pass
   }
   std::cout << "Exiting [ Tid: " << syscall(SYS_gettid) << " ]";
