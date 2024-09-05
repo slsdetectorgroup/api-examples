@@ -1,4 +1,4 @@
-
+// Instead of the slsReceiver
 #include <sls/Receiver.h>
 
 #include <csignal> //SIGINT

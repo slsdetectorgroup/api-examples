@@ -1,4 +1,4 @@
-
+// Must have shared memory and receiver already set up (e1-config)
 
 #include <sls/Detector.h>
 #include <sls/detectorData.h>
