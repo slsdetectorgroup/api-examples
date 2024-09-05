@@ -3,7 +3,7 @@
 #include <sls/Detector.h>
 #include <sls/detectorData.h>
 
-void dataCallback(detectorData *pData, uint64_t iframe, uint32_t isubframe,
+void dataCallback(sls::detectorData *pData, uint64_t iframe, uint32_t isubframe,
                   void *pArg) {
   std::cout << "\n DataCallback"
             << "\n ------------"

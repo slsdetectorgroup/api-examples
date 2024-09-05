@@ -12,102 +12,84 @@ sem_t semaphore;
 void sigInterruptHandler(int p) { sem_post(&semaphore); }
 
 /**
- * Start Acquisition Call back
- * slsReceiver writes data if file write enabled.
- * Users get data to write using call back if registerCallBackRawDataReady is
- * registered.
- * @param filepath file path
- * @param filename file name
- * @param fileindex file index
- * @param datasize data size in bytes
- * @param p pointer to object
- * \returns ignored
+ * Start Acquisition Call back (slsMultiReceiver writes data if file write
+ * enabled) if registerCallBackRawDataReady or
+ * registerCallBackRawDataModifyReady registered, users get data
  */
-int StartAcq(std::string filepath, std::string filename, uint64_t fileindex,
-             uint32_t datasize, void *p) {
-  std::cout << "#### StartAcq:  filepath:" << filepath
-            << "  filename:" << filename << " fileindex:" << fileindex
-            << "  datasize:" << datasize << " ####";
-  return 0;
+int StartAcq(const std::string &filePath, const std::string &fileName,
+             uint64_t fileIndex, size_t imageSize, void *objectPointer) {
+    std::cout << "#### StartAcq:  filePath:" << filePath
+                          << "  fileName:" << fileName
+                          << " fileIndex:" << fileIndex
+                          << "  imageSize:" << imageSize << " ####" << std::endl;
+    return 0;
+}
+
+/** Acquisition Finished Call back */
+void AcquisitionFinished(uint64_t framesCaught, void *objectPointer) {
+    std::cout << "#### AcquisitionFinished: framesCaught:"
+                          << framesCaught << " ####" << std::endl;
 }
 
 /**
- * Acquisition Finished Call back
- * @param frames Number of frames caught
- * @param p pointer to object
+ * Get Receiver Data Call back
+ * Prints in different colors(for each receiver process) the different headers
+ * for each image call back.
  */
-void AcquisitionFinished(uint64_t frames, void *p) {
-  std::cout << "#### AcquisitionFinished: frames:" << frames << " ####";
+void GetData(slsDetectorDefs::sls_receiver_header &header, char *dataPointer,
+             size_t imageSize, void *objectPointer) {
+    slsDetectorDefs::sls_detector_header detectorHeader = header.detHeader;
+
+    printf(
+        "#### %d %d GetData: ####\n"
+        "frameNumber: %lu\t\texpLength: %u\t\tpacketNumber: %u\t\tdetSpec1: %lu"
+        "\t\ttimestamp: %lu\t\tmodId: %u\t\t"
+        "row: %u\t\tcolumn: %u\t\tdetSpec2: %u\t\tdetSpec3: %u"
+        "\t\tdetSpec4: %u\t\tdetType: %u\t\tversion: %u"
+        //"\t\tpacketsMask:%s"
+        "\t\tfirstbytedata: 0x%x\t\tdatsize: %zu\n\n",
+        detectorHeader.column, detectorHeader.row,
+        (long unsigned int)detectorHeader.frameNumber, detectorHeader.expLength,
+        detectorHeader.packetNumber, (long unsigned int)detectorHeader.detSpec1,
+        (long unsigned int)detectorHeader.timestamp, detectorHeader.modId,
+        detectorHeader.row, detectorHeader.column, detectorHeader.detSpec2,
+        detectorHeader.detSpec3, detectorHeader.detSpec4,
+        detectorHeader.detType, detectorHeader.version,
+        // header->packetsMask.to_string().c_str(),
+        ((uint8_t)(*((uint8_t *)(dataPointer)))), imageSize);
 }
 
 /**
- * Get Receiver Data Call back and prints the header for each image call back.
- * @param metadata sls_receiver_header metadata
- * @param datapointer pointer to data
- * @param datasize data size in bytes.
- * @param p pointer to object
- */
-void GetData(char *metadata, char *datapointer, uint32_t datasize, void *p) {
-  slsDetectorDefs::sls_receiver_header *header =
-      (slsDetectorDefs::sls_receiver_header *)metadata;
-  slsDetectorDefs::sls_detector_header detectorHeader = header->detHeader;
-
-  std::cout << "#### " << detectorHeader.row << " GetData: ####\n"
-            << "frameNumber: " << detectorHeader.frameNumber
-            << "\t\texpLength: " << detectorHeader.expLength
-            << "\t\tpacketNumber: " << detectorHeader.packetNumber
-            << "\t\tbunchId: " << detectorHeader.bunchId
-            << "\t\ttimestamp: " << detectorHeader.timestamp
-            << "\t\tmodId: " << detectorHeader.modId
-            << "\t\trow: " << detectorHeader.row
-            << "\t\tcolumn: " << detectorHeader.column
-            << "\t\treserved: " << detectorHeader.reserved
-            << "\t\tdebug: " << detectorHeader.debug
-            << "\t\troundRNumber: " << detectorHeader.roundRNumber
-            << "\t\tdetType: " << detectorHeader.detType << "\t\tversion: "
-            << detectorHeader.version
-            //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
-            << "\t\tfirstbytedata: " << std::hex << "0x"
-            << ((uint8_t)(*((uint8_t *)(datapointer))))
-            << "\t\tdatsize: " << datasize << "\n\n";
-}
-
-/**
- * Get Receiver Data Call back (modified) and prints headers for each image call
- * back.
- * @param metadata sls_receiver_header metadata
- * @param datapointer pointer to data
- * @param revDatasize new data size in bytes after the callback.
+ * Get Receiver Data Call back (modified)
+ * Prints in different colors(for each receiver process) the different headers
+ * for each image call back.
+ * @param modifiedImageSize new data size in bytes after the callback.
  * This will be the size written/streamed. (only smaller value is allowed).
- * @param p pointer to object
  */
-void GetData(char *metadata, char *datapointer, uint32_t &revDatasize,
-             void *p) {
-  slsDetectorDefs::sls_receiver_header *header =
-      (slsDetectorDefs::sls_receiver_header *)metadata;
-  slsDetectorDefs::sls_detector_header detectorHeader = header->detHeader;
+void GetData(slsDetectorDefs::sls_receiver_header &header, char *dataPointer,
+             size_t &modifiedImageSize, void *objectPointer) {
+    slsDetectorDefs::sls_detector_header detectorHeader = header.detHeader;
 
-  std::cout << "#### " << detectorHeader.row << " GetData: ####\n"
-            << "frameNumber: " << detectorHeader.frameNumber
-            << "\t\texpLength: " << detectorHeader.expLength
-            << "\t\tpacketNumber: " << detectorHeader.packetNumber
-            << "\t\tbunchId: " << detectorHeader.bunchId
-            << "\t\ttimestamp: " << detectorHeader.timestamp
-            << "\t\tmodId: " << detectorHeader.modId
-            << "\t\trow: " << detectorHeader.row
-            << "\t\tcolumn: " << detectorHeader.column
-            << "\t\treserved: " << detectorHeader.reserved
-            << "\t\tdebug: " << detectorHeader.debug
-            << "\t\troundRNumber: " << detectorHeader.roundRNumber
-            << "\t\tdetType: " << detectorHeader.detType << "\t\tversion: "
-            << detectorHeader.version
-            //<< "\t\tpacketsMask: " << header->packetsMask.to_string()
-            << "\t\tfirstbytedata: " << std::hex << "0x"
-            << ((uint8_t)(*((uint8_t *)(datapointer))))
-            << "\t\tdatsize: " << revDatasize << "\n\n";
+    printf(
+        "#### %d %d GetData: ####\n"
+        "frameNumber: %lu\t\texpLength: %u\t\tpacketNumber: %u\t\tdetSpec1: %lu"
+        "\t\ttimestamp: %lu\t\tmodId: %u\t\t"
+        "row: %u\t\tcolumn: %u\t\tdetSpec2: %u\t\tdetSpec3: %u"
+        "\t\tdetSpec4: %u\t\tdetType: %u\t\tversion: %u"
+        //"\t\tpacketsMask:%s"
+        "\t\tfirstbytedata: 0x%x\t\tdatsize: %zu\n\n",
+        detectorHeader.column, detectorHeader.row,
+        (long unsigned int)detectorHeader.frameNumber, detectorHeader.expLength,
+        detectorHeader.packetNumber, (long unsigned int)detectorHeader.detSpec1,
+        (long unsigned int)detectorHeader.timestamp, detectorHeader.modId,
+        detectorHeader.row, detectorHeader.column, detectorHeader.detSpec2,
+        detectorHeader.detSpec3, detectorHeader.detSpec4,
+        detectorHeader.detType, detectorHeader.version,
+        // header->packetsMask.to_string().c_str(),
+        *reinterpret_cast<uint8_t *>(dataPointer), modifiedImageSize);
 
-  // if data is modified, eg ROI and size is reduced
-  revDatasize = 26000;
+    // if data is modified, eg ROI and size is reduced
+    modifiedImageSize = 26000;
 }
 
 int main(int argc, char *argv[]) {

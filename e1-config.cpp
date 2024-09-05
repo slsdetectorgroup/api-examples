@@ -18,5 +18,5 @@ int main(int argc, char *argv[]){
 
     std::cout << "\n\n";
     std::cout << type << " detector with " << nmod << " modules configured\n";
-
+ 
 }

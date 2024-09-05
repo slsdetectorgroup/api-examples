@@ -26,5 +26,5 @@ int main(){
     std::cout << "Exptime in ns: " << t_ns << '\n';
     std::cout << "Exptime in s: " << std::chrono::duration<double>(t2).count() << '\n';
 
-
+ 
 }
