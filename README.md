@@ -8,12 +8,11 @@
 * E5 Client callback in acquire 
 
 
-# compilation
+# Compilation
 
-## compile and install the package
-Refer to [software wiki](https://slsdetectorgroup.github.io/devdoc/installation.html#build-using-cmake) on installation instructions
+* Refer to [software wiki](https://slsdetectorgroup.github.io/devdoc/installation.html#build-using-cmake) on installation instructions for the slsDetectorPackage
 
-## compile api-examples pointing to the package install path
+* Compile
 ```
 # outside api-examples folder
 mkdir build && cd build
