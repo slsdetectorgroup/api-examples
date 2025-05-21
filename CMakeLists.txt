@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(myintegration)
 
 add_subdirectory(slsDetectorPackage)
-#find_package(slsDetectorPackage 8.0.1 REQUIRED)
+#find_package(slsDetectorPackage 9.1.1 REQUIRED)
 
 add_executable(e1-config e1-config.cpp)
 target_link_libraries(e1-config slsDetectorShared)
